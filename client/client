@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+import sys
+import requests
+
+AVAILABLE_COMMANDS = '''
+COMMANDS
+    --get_tasks
+    --get_task
+    --create_task
+    --delete_task
+    --delete_tasks
+    --help
+'''
+
+ERROR_MESSAGE = '''
+client: invalid option
+Try 'client --help' for more information.
+'''
+
+with open("/home/gubebra/insper/6s/cloud/multi-cloud-orm-script/loadbalancer_DNS", "r") as f: URL = 'http://' + f.read() + ':8080/tasks/'
+
+AVAILABLE_COMMANDS_LIST = ['--get_tasks', '--create_task', '--get_task', '--delete_tasks', '--delete_task', '--help']
+
+def get_tasks():
+    x = requests.get(url=URL + 'getTasks/')
+    print(x.text)
+
+def get_task():
+    x = requests.get(url=URL + 'getTask/')
+    print(x.status)
+
+def create_task():
+    task = {
+        "title": "test",
+        "pub_date": "2020-11-20T12:34:09Z",
+        "description": "test"
+    }
+    x = requests.post(url=URL + 'createTask/', json=task)
+    print(x.text)
+
+def delete_tasks():
+    x = requests.delete(url=URL + 'deleteTasks/')
+    print(x.text)
+
+def delete_task():
+    task = { "title": "test_client", "pub_date": "2020-11-20T12:34:09Z", "description": "test_client aps final" }
+    x = requests.post(url=URL + 'deleteTasks/', data=task)
+    print(x.text)
+
+def help():
+    print(AVAILABLE_COMMANDS)
+
+def main():
+    if len(sys.argv) == 1: 
+        command = "--help"
+    else:
+        if sys.argv[1] in AVAILABLE_COMMANDS_LIST: 
+            command = sys.argv[1]
+        else: 
+            print(ERROR_MESSAGE)
+            return 1
+
+    if command == "--help": help()
+    elif command == "--get_tasks": get_tasks()
+    elif command == "--get_task": get_task()
+    elif command == "--create_task": create_task()
+    elif command == "--delete_tasks": delete_tasks()
+    elif command == "--delete_task": delete_task()
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
